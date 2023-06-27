@@ -1,19 +1,15 @@
 ﻿// 201-351_Rahmatullaev.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
-//
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include <conio.h>
-
 #include <random>
 
 
 using namespace std;
 
-
-
-vector<pair<string, string>> UserAccounts;
+vector<pair<string, string>> Accounts;
 
 bool check_pin(string key)
 {
@@ -28,7 +24,7 @@ string generateRandomCreds()
 
     int randomNumlenght = rand() % 5 + 4;
 
-    static const string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     string result;
 
     for (int i = 0; i < randomNumlenght; ++i) {
@@ -42,12 +38,13 @@ string generateRandomCreds()
 
 void generateAcc() {
     int randomNumlenght = rand() % 10 + 5;
-    cout << "Всего аккаунтов: " << randomNumlenght << "\n";
+    cout << "Всего аккаунтов: " << randomNumlenght -1 << "\n";
     for (int i = 0; i < randomNumlenght; i++) {
+
         string login = generateRandomCreds();
         string password = generateRandomCreds();
 
-        UserAccounts.emplace_back(login, password);
+        Accounts.emplace_back(login, password);
     }
 }
 string enterpin() {
@@ -66,7 +63,7 @@ string enterpin() {
         }
         else {
             key += ch;
-            cout << '*';  // Выводим звездочку вместо введенного символа
+            cout << '*'; 
             i++;
         }
     }
@@ -77,39 +74,33 @@ string enterpin() {
 int main()
 {
     setlocale(LC_ALL, "Russian");
-
-    string key = enterpin();
-
     srand(time(0));
-
-    
-
-    if (check_pin(key))
+    while (true)
     {
-        generateAcc();
-        int NumAcc;
-        while (true)
+        string key = enterpin();
+        if (check_pin(key))
         {
-            cout << "Введите номер аккаунта (или -1 для выхода): ";
-            cin >> NumAcc;
-            if (NumAcc == -1) {
-                cout << "Выход\n";
-                break;
-                
-            }
-            if (NumAcc < 0 || NumAcc >= UserAccounts.size()) { cout << "Аккаунт не найден!\n";}
-            else
+            generateAcc();
+            while (true)
             {
-                cout << "Логин: " << UserAccounts[NumAcc].first << "\n";
-                cout << "Пароль: " << UserAccounts[NumAcc].second << "\n";
-            }
+                int NumAcc;
+                cout << "Введите номер аккаунта (для выхода из программы введите -1): ";
+                cin >> NumAcc;
+                if (NumAcc == -1) {
+                    cout << "Выход\n";
+                    return 0;
+                }
+                if (NumAcc < -1 || NumAcc >= Accounts.size()) { cout << "Аккаунт не найден!\n"; }
+                else
+                {
+                    cout << "Логин: " << Accounts[NumAcc].first << "\n" << "Пароль: " << Accounts[NumAcc].second << "\n";
+                }
+            } 
         }
-    }
-    else
-    {
-        cout << "Введен неверный пин-код" << "\n";
-        return -1;
-    }
-
+        else
+        {
+            cout << "Введен неверный пин-код" << "\n";
+        }
+    }  
 }
 
