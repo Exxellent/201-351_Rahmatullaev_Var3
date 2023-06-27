@@ -100,8 +100,8 @@ int main()
             if (NumAcc < 0 || NumAcc >= UserAccounts.size()) { cout << "Аккаунт не найден!\n";}
             else
             {
-                cout << "Login: " << UserAccounts[NumAcc].first << "\n";
-                cout << "Password: " << UserAccounts[NumAcc].second << "\n";
+                cout << "Логин: " << UserAccounts[NumAcc].first << "\n";
+                cout << "Пароль: " << UserAccounts[NumAcc].second << "\n";
             }
         }
     }
