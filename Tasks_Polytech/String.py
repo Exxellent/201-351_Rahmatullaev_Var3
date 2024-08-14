@@ -1,3 +1,4 @@
+### 6.1-6.2
 def find_shortest_word(sentence):
     # Разделяем строку на слова
     words = sentence.split()
