@@ -1,27 +1,26 @@
-﻿// 201-351_Rahmatullaev.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
-
 #include <iostream>
 #include <string>
 #include <vector>
-#include <conio.h>
+#include <termios.h>
+#include <unistd.h>
 #include <random>
-
 
 using namespace std;
 
+// Вектор для хранения пар логин-пароль
 vector<pair<string, string>> Accounts;
 
+// Функция проверки введенного пин-кода
 bool check_pin(string key)
 {
     const string goodpass = "1234";
     return key == goodpass;
 }
 
-
+// Функция генерации случайной строки, используемой для логинов и паролей
 string generateRandomCreds()
 {
     string randomString;
-
     int randomNumlenght = rand() % 5 + 4;
 
     string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -35,42 +34,69 @@ string generateRandomCreds()
     return result;
 }
 
-
+// Функция генерации аккаунтов со случайными логинами и паролями
 void generateAcc() {
     int randomNumlenght = rand() % 10 + 5;
     cout << "Всего аккаунтов: " << randomNumlenght -1 << "\n";
     for (int i = 0; i < randomNumlenght; i++) {
-
         string login = generateRandomCreds();
         string password = generateRandomCreds();
-
         Accounts.emplace_back(login, password);
     }
 }
+
+// Функция для чтения символа с клавиатуры без ожидания Enter
+char getch() {
+    char buf = 0;
+    struct termios old = {0};
+    // Получение текущих настроек терминала
+    if (tcgetattr(0, &old) < 0)
+        perror("tcsetattr()");
+    // Отключение канонического режима и эхо-режима
+    old.c_lflag &= ~ICANON;
+    old.c_lflag &= ~ECHO;
+    old.c_cc[VMIN] = 1;
+    old.c_cc[VTIME] = 0;
+    // Применение новых настроек
+    if (tcsetattr(0, TCSANOW, &old) < 0)
+        perror("tcsetattr ICANON");
+    // Чтение одного символа
+    if (read(0, &buf, 1) < 0)
+        perror("read()");
+    // Возврат настроек терминала в исходное состояние
+    old.c_lflag |= ICANON;
+    old.c_lflag |= ECHO;
+    if (tcsetattr(0, TCSADRAIN, &old) < 0)
+        perror("tcsetattr ~ICANON");
+    return buf;
+}
+
+// Функция для ввода пин-кода с использованием функции getch
 string enterpin() {
     cout << "Введите пинкод: \n";
     string key;
-    int i = 0;
     char ch;
 
-    while ((ch = _getch()) != '\r') { 
-        if (ch == '\b') {  
-            if (i > 0) {
-                cout << "\b \b";  
-                i--;
-                key.pop_back();
+    while ((ch = getch()) != '\n') {
+        if (ch == '\b' || ch == 127) {  // Обработка клавиши Backspace
+            if (!key.empty()) {
+                cout << "\b \b";  // Удаление символа на экране
+                key.pop_back();   // Удаление символа из строки
+                cout.flush();        // Принудительное обновление экрана
+
             }
-        }
-        else {
-            key += ch;
-            cout << '*'; 
-            i++;
+        } else {
+            key += ch;            // Добавление символа в строку
+            cout << '*';          // Отображение звездочки вместо символа
+            cout.flush();        // Принудительное обновление экрана
+
         }
     }
     cout << "\n";
     return key;
 }
 
+// Основная функция программы
 int main()
 {
     setlocale(LC_ALL, "Russian");
@@ -103,4 +129,3 @@ int main()
         }
     }  
 }
-
